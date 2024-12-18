@@ -1,43 +1,39 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:walletapp/pages/login_screen.dart';
+import 'package:walletapp/uipages/home_screen.dart';
+import 'package:walletapp/uipages/signup_screen.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
   bool _isObscured = true;
   bool _isLoading = false;
 
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode passFocusNode = FocusNode();
-  final FocusNode nameFocusNode = FocusNode();
 
   @override
   void dispose() {
     emailController.dispose();
     passController.dispose();
-    nameController.dispose();
     emailFocusNode.dispose();
     passFocusNode.dispose();
-    nameFocusNode.dispose();
     super.dispose();
   }
 
-  Future<void> registerUser(BuildContext context) async {
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passController.text.isEmpty) {
+  Future<void> login() async {
+    if (emailController.text.isEmpty || passController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('All fields are required.'),
+          content: Text('Email and Password cannot be empty.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -49,40 +45,49 @@ class _SignupScreenState extends State<SignupScreen> {
     });
 
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passController.text,
       );
 
-      await credential.user?.updateDisplayName(nameController.text);
-
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Registration successful!'),
+          content: Text('Login successful!'),
           backgroundColor: Colors.green,
         ),
       );
+
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
       String message;
-      if (e.code == 'weak-password') {
-        message = 'The password provided is too weak.';
-      } else if (e.code == 'email-already-in-use') {
-        message = 'The account already exists for that email.';
+
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided.';
       } else {
-        message = 'An unexpected error occurred: ${e.message}';
+        message = 'Unexpected error: ${e.message}';
       }
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
       );
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() {
@@ -93,11 +98,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -122,33 +130,18 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Image.asset('assets/images/logo.png'),
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: screenWidth * 0.9,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 30),
                 const Text(
-                  "Create a new account if you don't have.",
+                  'Already have an account?',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: TextFormField(
-                    controller: nameController,
-                    focusNode: nameFocusNode,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      hintText: 'Name',
-                      hintStyle: const TextStyle(color: Colors.purple),
-                    ),
-                    keyboardType: TextInputType.name,
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: TextFormField(
@@ -180,7 +173,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       hintText: 'Password',
-                      hintStyle: const TextStyle(color: Colors.deepPurple),
+                      hintStyle: const TextStyle(color: Colors.purple),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isObscured ? Icons.visibility_off : Icons.visibility,
@@ -198,7 +191,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: _isLoading ? null : () => registerUser(context),
+                  onPressed: _isLoading ? null : login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple,
                     padding: const EdgeInsets.symmetric(horizontal: 120),
@@ -209,19 +202,20 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                          'Sign Up',
+                          'Sign In',
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                 ),
-                const SizedBox(height: 10),
-                const Text('Already have an account?'),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
+                const Text("Create a new account if you don't have."),
+                const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
+                        builder: (context) => const SignupScreen(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -232,7 +226,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Sign In',
+                    'Sign Up',
                     style: TextStyle(color: Colors.purple, fontSize: 20),
                   ),
                 ),

@@ -1,5 +1,4 @@
-import 'package:walletapp/pages/login_screen.dart';
-
+import 'package:walletapp/uipages/login_screen.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
