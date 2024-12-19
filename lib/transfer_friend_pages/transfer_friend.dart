@@ -161,7 +161,7 @@ class _TransferFundState extends State<Transfer> {
                       children: const [
                         SizedBox(width: 20),
                         Text(
-                          'All contacts',
+                          'All Contacts',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

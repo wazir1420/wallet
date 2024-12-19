@@ -1,35 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:walletapp/transfer_friend_pages/transaction_sucess.dart';
-import 'package:walletapp/transfer_friend_pages/transfer_friend.dart';
+import 'package:walletapp/bank_transfer_pages/bank_list.dart';
 
-class ContactDetailsScreen extends StatefulWidget {
-  final Contact contact;
-
-  const ContactDetailsScreen({super.key, required this.contact});
+class BankTransfer extends StatefulWidget {
+  const BankTransfer({super.key});
 
   @override
-  State<ContactDetailsScreen> createState() => _ContactDetailsScreenState();
+  State<BankTransfer> createState() => _FriendTransferState();
 }
 
-class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
+class _FriendTransferState extends State<BankTransfer> {
   TextEditingController amountController = TextEditingController();
   TextEditingController notesController = TextEditingController();
 
   bool isButtonEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    amountController.addListener(checkButtonState);
-  }
-
-  @override
-  void dispose() {
-    amountController.dispose();
-    notesController.dispose();
-    super.dispose();
-  }
 
   void checkButtonState() {
     setState(() {
@@ -42,6 +25,20 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    amountController.addListener(checkButtonState);
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    notesController.dispose();
+    super.dispose();
+  }
+
   void updateAmountWithPrefix(String value) {
     String newValue = value.replaceAll(RegExp('[^0-9]'), '');
     if (newValue.isNotEmpty) {
@@ -51,11 +48,6 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
       text: newValue,
       selection: TextSelection.collapsed(offset: newValue.length),
     );
-  }
-
-  String generateReferenceNumber() {
-    final random = DateTime.now().millisecondsSinceEpoch.toString();
-    return 'REF${random.substring(random.length - 10)}';
   }
 
   @override
@@ -71,18 +63,25 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
               children: [
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                  ),
                 ),
                 const Spacer(),
                 const Text(
-                  'Transfer to Friends',
+                  'Transfer to Bank',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const Spacer(),
-                const Icon(Icons.help, color: Colors.white),
+                const Icon(
+                  Icons.help,
+                  color: Colors.white,
+                ),
               ],
             ),
           ),
@@ -95,24 +94,32 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("Your Balance",
-                        style: TextStyle(color: Colors.white70, fontSize: 16)),
+                    Text(
+                      "Your Balance",
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
                     SizedBox(height: 5),
-                    Text("Rp 24.321.900",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      "Rp 24.321.900",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: Image.asset('assets/images/icon-wallet.png',
-                      height: 20, width: 20),
+                  icon: Image.asset(
+                    'assets/images/icon-wallet.png',
+                    height: 20,
+                    width: 20,
+                  ),
                   label: const Text("Top Up"),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.purple),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.purple,
+                  ),
                 ),
               ],
             ),
@@ -120,7 +127,9 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
           Expanded(
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
               child: Container(
                 color: Colors.white,
                 padding: const EdgeInsets.all(20),
@@ -131,38 +140,50 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage:
-                                      AssetImage(widget.contact.imagePath)),
-                              title: Text(widget.contact.name,
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold)),
-                              subtitle: Text(widget.contact.phoneNumber),
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                hintText: 'Select Bank Destination',
+                                hintStyle: TextStyle(color: Colors.grey[600]),
+                                suffixIcon: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => MyBank()));
+                                    },
+                                    child: Image.asset(
+                                        'assets/images/arrow-down.png')),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey.shade400, width: 1.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey.shade400, width: 1.0),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey.shade400, width: 1.0),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
                             ),
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Transfer()));
-                              },
-                              child: Image.asset('assets/images/icon-edit.png'))
                         ],
                       ),
                       const SizedBox(height: 20),
                       Center(
                         child: Column(
                           children: [
-                            const Text("Set Amount",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                            const Text(
+                              "Set Amount",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500),
+                            ),
                             const SizedBox(height: 10),
                             SizedBox(
                               width: 200,
@@ -176,8 +197,9 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide.none),
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide.none,
+                                  ),
                                   hintStyle: const TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold),
@@ -192,12 +214,21 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                       const SizedBox(height: 20),
                       Row(
                         children: [
-                          const Text("Notes",
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
-                          Text(" (Optional)",
-                              style: TextStyle(
-                                  fontSize: 14, color: Colors.grey[600])),
+                          const Text(
+                            "Notes",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            " (Optional)",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey[600],
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -229,26 +260,10 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
               child: ElevatedButton(
                 onPressed: isButtonEnabled
                     ? () {
-                        double amount = double.parse(amountController.text
-                            .replaceAll(RegExp('[^0-9]'), ''));
-                        double fee = amount * 0.02;
-                        double totalAmount = amount + fee;
-                        String referenceNumber = generateReferenceNumber();
-                        String transactionDate =
-                            DateFormat('dd MMM yyyy, hh:mm a')
-                                .format(DateTime.now());
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TransactionSuccessScreen(
-                              amount: amount,
-                              referenceNumber: referenceNumber,
-                              fee: fee,
-                              total: totalAmount,
-                              date: transactionDate,
-                              contact: widget.contact,
-                            ),
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                "Transferring Rp ${amountController.text}"),
                           ),
                         );
                       }
@@ -257,10 +272,13 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                   backgroundColor:
                       isButtonEnabled ? Colors.purple : Colors.grey[400],
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-                child: const Text("Proceed to Transfer",
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
+                child: const Text(
+                  "Proceed to Transfer",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walletapp/bank_transfer_pages/bank_transfer.dart';
 import 'package:walletapp/transfer_friend_pages/friend_transfer.dart';
 
 class TransferFund extends StatefulWidget {
@@ -85,9 +86,17 @@ class _TransferFundState extends State<TransferFund> {
                             label: 'Transfer to Friends',
                           ),
                         ),
-                        TransferOption(
-                          image: 'assets/images/icon-bank.png',
-                          label: 'Transfer to Bank',
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BankTransfer()));
+                          },
+                          child: TransferOption(
+                            image: 'assets/images/icon-bank.png',
+                            label: 'Transfer to Bank',
+                          ),
                         ),
                       ],
                     ),

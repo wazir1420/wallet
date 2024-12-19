@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:walletapp/transfer_friend_pages/transaction_sucess.dart';
-import 'package:walletapp/transfer_friend_pages/transfer_friend.dart';
+import 'package:walletapp/bank_transfer_pages/bank_list.dart'; // Import your BankContact class if it's in another file
+import 'package:walletapp/bank_transfer_pages/transaction_su_bank.dart'; // Import your TransactionSuBank screen
 
-class ContactDetailsScreen extends StatefulWidget {
-  final Contact contact;
+class BankDetailsScreen extends StatefulWidget {
+  final BankContact bankContact;
+  final String accountNumber;
 
-  const ContactDetailsScreen({super.key, required this.contact});
+  const BankDetailsScreen({
+    super.key,
+    required this.bankContact,
+    required this.accountNumber,
+  });
 
   @override
-  State<ContactDetailsScreen> createState() => _ContactDetailsScreenState();
+  State<BankDetailsScreen> createState() => _ContactDetailsScreenState();
 }
 
-class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
+class _ContactDetailsScreenState extends State<BankDetailsScreen> {
   TextEditingController amountController = TextEditingController();
   TextEditingController notesController = TextEditingController();
-
   bool isButtonEnabled = false;
 
   @override
@@ -60,6 +64,9 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String maskedAccountNumber = '*' * (widget.accountNumber.length - 5) +
+        widget.accountNumber.substring(widget.accountNumber.length - 5);
+
     return Scaffold(
       backgroundColor: Colors.purple,
       body: Column(
@@ -132,15 +139,21 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                         children: [
                           Expanded(
                             child: ListTile(
-                              leading: CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage:
-                                      AssetImage(widget.contact.imagePath)),
-                              title: Text(widget.contact.name,
+                              leading: Container(
+                                height: 40,
+                                width: 40,
+                                decoration:
+                                    BoxDecoration(color: Colors.grey.shade100),
+                                child: Center(
+                                  child:
+                                      Image.asset(widget.bankContact.imagePath),
+                                ),
+                              ),
+                              title: Text(widget.bankContact.name,
                                   style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold)),
-                              subtitle: Text(widget.contact.phoneNumber),
+                              subtitle: Text(maskedAccountNumber),
                             ),
                           ),
                           SizedBox(
@@ -151,7 +164,7 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Transfer()));
+                                        builder: (context) => MyBank()));
                               },
                               child: Image.asset('assets/images/icon-edit.png'))
                         ],
@@ -241,13 +254,14 @@ class _ContactDetailsScreenState extends State<ContactDetailsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TransactionSuccessScreen(
+                            builder: (context) => TransactionSuBank(
                               amount: amount,
                               referenceNumber: referenceNumber,
                               fee: fee,
                               total: totalAmount,
                               date: transactionDate,
-                              contact: widget.contact,
+                              bankContact: widget.bankContact,
+                              accountNumber: widget.accountNumber,
                             ),
                           ),
                         );
